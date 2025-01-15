@@ -2,8 +2,14 @@ from utils.locator_reader import read_locators
 import time
 import logging
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from .get_tile_data import get_tile_data
+from .click_map_icon import click_map_icon
+from .get_map_data import extract_map_data
+from .click_property_title import click_property_title_and_close_tab
 
-def traverse_random_tiles(driver, sorted_tile_indices,  scroll_time=2):
+def traverse_random_tiles(driver, sorted_tile_indices,  scroll_time=3):
     """
     Traverses through the selected random property tiles one by one.
 
@@ -15,19 +21,49 @@ def traverse_random_tiles(driver, sorted_tile_indices,  scroll_time=2):
     """
     try :
         locators = read_locators()
-        tiles_locator = locators.get("property_tile")
-        all_tiles = driver.find_elements(By.XPATH, tiles_locator)
+        
 
         for index in sorted_tile_indices:
             # Get the current tile based on the sorted index
-            tile = all_tiles[index]
+            tile_xpath = locators.get("tile_individual").format(index=index)
+            # print(tile_xpath)
+            # Get the current tile element using the dynamic XPath
+            tile = driver.find_element(By.XPATH, tile_xpath)
+
 
             # Scroll the window to the selected tile
-            driver.execute_script("arguments[0].scrollIntoView();", tile)
-            time.sleep(scroll_time)  # Wait for a short time to visualize the scroll
+            driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center', inline: 'center'});", tile)
 
-            # Log the traversal
-            logging.info(f"Traversing to tile {index + 1}: {tile.text[:50]}...")  
+            time.sleep(scroll_time) 
+            driver.execute_script("window.scrollBy(0, -100);")
+
+            # Wait for the data to be visible before extracting it
+            WebDriverWait(driver, 5).until(
+                EC.visibility_of(tile)
+            )
+
+            tile_data = get_tile_data(driver,tile)
+            time.sleep(2)
+            click_map_icon(driver,tile)
+            map_data = extract_map_data(driver)
+            time.sleep(1)
+            click_property_title_and_close_tab(driver,tile)
+            time.sleep(1)
+
+
+
+
+
+            # Print data for debugging
+            logging.info(f"Data from tile {index}: {tile_data}")
+            logging.info(f"Data from map {index}: {map_data}")
+            
+
+            # Clear the tile_data for next iteration
+            tile_data.clear()
+            map_data.clear()
+
+           
             
     except Exception as e:
-        logging.error(f"Error during tile traversal: {e}")
+        logging.error(f"Error during tile traversal and data extraction: {e}")
