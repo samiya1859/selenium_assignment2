@@ -3,6 +3,9 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from utils.locator_reader import read_locators
 
+def extract_price(price_data):
+    return price_data.replace("From ", "").strip()
+
 def get_tile_data(driver, tile_element):
     """
     Extracts data from a single property tile.
@@ -35,7 +38,9 @@ def get_tile_data(driver, tile_element):
 
         if price_locator := locators.get("price"):
             try:
-                tile_data['price'] = tile_element.find_element(By.XPATH, price_locator).text
+                raw_price = tile_element.find_element(By.XPATH, price_locator).text
+                tile_data['price'] = extract_price(raw_price)
+                
             except NoSuchElementException:
                 logging.error("Price not found, setting to 'N/A'")
 

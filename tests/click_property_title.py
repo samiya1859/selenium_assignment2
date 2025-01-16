@@ -2,6 +2,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import time
 from utils.locator_reader import read_locators
+from .detail_page_data import get_detail_data
 
 
 def click_property_title_and_close_tab(driver, tile):
@@ -16,7 +17,7 @@ def click_property_title_and_close_tab(driver, tile):
         title_locator.click()
         
         # Wait for the new tab to open
-        time.sleep(2)  # Adjust time as needed for the tab to load
+        time.sleep(2)  
         
         # Get all the window handles (tabs)
         window_handles = driver.window_handles
@@ -24,8 +25,11 @@ def click_property_title_and_close_tab(driver, tile):
         # Switch to the new tab (last tab opened)
         driver.switch_to.window(window_handles[-1])
         
-        # Do nothing here (or just wait for now)
-        time.sleep(2)  # Simulating some idle time in the new tab
+        
+        time.sleep(4)
+        detail_data = get_detail_data(driver)
+        
+        
         
         # Close the new tab
         driver.close()
@@ -33,6 +37,8 @@ def click_property_title_and_close_tab(driver, tile):
         # Switch back to the original tab (the first tab)
         driver.switch_to.window(window_handles[0])
         print(f"Switched back to the original tab: {window_handles[0]}")
+
+        return detail_data
         
     except Exception as e:
         print(f"Error during title click and tab switch: {e}")

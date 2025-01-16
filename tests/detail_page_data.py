@@ -6,19 +6,25 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support import expected_conditions as EC
 import logging
+import re
 
-def extract_map_data(driver):
-    """
-    Extracts data from the map info window after the map icon is clicked.
 
-    Args:
-    driver: WebDriver instance
-    
-    
-    Returns:
-    dict: A dictionary containing the extracted map data (e.g., title, price, rating).
-    """
-    map_data = {
+def extract_type(data_type):
+    match = re.search(r'Check (\w+) Availability', data_type)
+    if match:
+        return match.group(1)
+    return data_type
+
+def extract_title(data_type):
+    # Split the string at " | " and return the first part
+    cleaned_type = data_type.split(" | ")[0]
+    return cleaned_type.strip()
+
+def get_detail_data(driver):
+
+    """Extracts property details from the new tab."""
+
+    detail_data = {
         'title': 'N/A',
         'price': 'N/A',
         'type': 'N/A',
@@ -26,70 +32,69 @@ def extract_map_data(driver):
         'reviews': 'N/A'
     }
 
-    
-
     try:
         locators = read_locators()
 
-        map_info_locator = locators.get("map_box")
-        print("map-box",map_info_locator)
-        map_info_box = WebDriverWait(driver, 5).until(
-            EC.visibility_of_element_located((By.XPATH, map_info_locator))
+        detail_container = locators.get("detail_container")
+        # print("detail container : ",detail_container)
+
+        detail_box = WebDriverWait(driver,20).until(
+            EC.visibility_of_element_located((By.XPATH,detail_container))
         )
 
-        
-        # Extract data based on the locators
-        title_locator = locators.get("map_title")
+
+        title_locator = locators.get("detail_title")
         if title_locator:
             try:
-                map_data['title'] = map_info_box.find_element(By.XPATH, title_locator).text
+                raw_title = detail_box.find_element(By.XPATH, title_locator).text
+                detail_data['title'] = extract_title(raw_title)
+
             except NoSuchElementException:
                 logging.error("Title not found, setting to 'N/A'")
         else:
             logging.warning("Locator for map title is missing.")
 
-        price_locator = locators.get("map_price")
+        price_locator = locators.get("detail_price")
         if price_locator:
             try:
-                map_data['price'] = map_info_box.find_element(By.XPATH, price_locator).text
+                detail_data['price'] = detail_box.find_element(By.XPATH, price_locator).text
             except NoSuchElementException:
                 logging.error("Price not found, setting to 'N/A'")
         else:
             logging.warning("Locator for map price is missing.")
 
-        type_locator = locators.get("map_type")
+        type_locator = locators.get("detail_type")
         if type_locator:
             try:
-                map_data['type'] = map_info_box.find_element(By.XPATH, type_locator).text
+                raw_type = detail_box.find_element(By.XPATH, type_locator).text
+                detail_data['type']=extract_type(raw_type)
             except NoSuchElementException:
                 logging.error("Type not found, setting to 'N/A'")
         else:
             logging.warning("Locator for map type is missing.")
 
-        rating_locator = locators.get("map_rating")
+        rating_locator = locators.get("detail_rating")
         if rating_locator:
             try:
-                map_data['rating'] = map_info_box.find_element(By.XPATH, rating_locator).text
+                detail_data['rating'] = detail_box.find_element(By.XPATH, rating_locator).text
             except NoSuchElementException:
                 logging.error("Rating not found, setting to 'N/A'")
         else:
             logging.warning("Locator for map rating is missing.")
 
-        # Try standard locator first
-        reviews_locator = locators.get("map_review")
+        reviews_locator = locators.get("detail_review")
         if reviews_locator:
             try:
-                map_data['reviews'] = map_info_box.find_element(By.XPATH, reviews_locator).text
+                detail_data['reviews'] = detail_box.find_element(By.XPATH, reviews_locator).text
             except NoSuchElementException:
                 logging.error("Reviews not found, setting to 'N/A'")
         else:
             logging.warning("Locator for map reviews is missing.")
-  
-        return map_data
+            
+        
 
     except Exception as e:
-        logging.error(f"Error extracting data from map: {e}")
-        return map_data
+        logging.error(f"Error extracting data from detail page: {e}")
 
-
-
+    return detail_data
+   

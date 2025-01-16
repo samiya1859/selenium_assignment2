@@ -2,3 +2,5 @@ selenium
 openpyxl
 pytest
 pyyaml
+XlsxWriter
+requests
