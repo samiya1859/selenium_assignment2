@@ -12,29 +12,39 @@ This project automates the verification of property details (title, price, type,
 - Uses Faker for generating random location data.
 - Logs test execution and errors for easier debugging.
 
-## Project Structure
+## Folder Structure
 ```
 selenium_assignment2/
 |-- config/
-|   |-- config.py  # Configuration settings.
+|   |-- config.py              # Configuration settings.
 |-- utils/
-|   |-- driver_setup.py  # WebDriver initialization.
-|   |-- locator_reader.py  # Reads locators from configuration.
-|   |-- generate_excel.py  # Generates test reports in Excel format.
+|   |-- driver_setup.py        # WebDriver initialization.
+|   |-- locator_reader.py      # Reads locators from an external file.
+|   |-- generate_excel.py      # Generates test reports in Excel format.
 |-- tests/
-|   |-- scroll_for_tiles.py  # Scrolls through property tiles.
-|   |-- traverse_property_tiles.py  # Handles property data extraction.
-|   |-- detail_page_data.py  # Extracts details from the property detail page.
-|   |-- reading_xpaths.py  # Reads locators for dynamic elements.
-|-- main.py  # Entry point for running the project.
-|-- requirements.txt  # Dependencies.
-|-- README.md  # Project documentation.
+|   |-- scroll_for_tiles.py     # Scrolls through property tiles dynamically.
+|   |-- traverse_property_tiles.py  # Handles property data traversal and extraction.
+|   |-- detail_page_data.py     # Extracts property details from the detail page.
+|   |-- map_data.py       # get data from map.
+|   |-- get_tile_data.py       # Extracts data from tile.
+|   |-- .py # Validates data consistency between different views.
+|   |-- base_test.py            # Base test setup for common test utilities.
+|-- main.py                     # Main script to run the automation.
+|-- requirements.txt            # Dependencies for the project.
+|-- README.md                   # Project documentation (this file).
 ```
+
 
 ## Prerequisites
 - Python 3.x
 - Google Chrome
 - Chromedriver compatible with your Chrome version
+
+ ### Python Installation
+1. Download the latest version of Python from the official website: [https://www.python.org/downloads/](https://www.python.org/downloads/).
+2. Run the installer and follow the setup instructions.
+3. Ensure you check the box **"Add Python to PATH"** during installation.
+4. Verify installation by running `python --version` and `pip --version` in your terminal or command prompt.
 
 ### Installing Chromedriver
 
@@ -137,5 +147,5 @@ The `generate_excel.py` script creates an Excel file summarizing the test result
 This README provides comprehensive guidance for setting up, running, and understanding the project workflow. For any additional queries or issues, feel free to contact the project maintain
 
 
-
+**Note**: Ensure the correct version of ChromeDriver is always used to avoid compatibility issues
 
